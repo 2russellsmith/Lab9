@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+var mongoose = require('mongoose');
+var Comment = mongoose.model('Comment');
 router.param('comment', function(req, res, next, id) {
   var query = Comment.findById(id);
   query.exec(function (err, comment){
@@ -9,6 +11,13 @@ router.param('comment', function(req, res, next, id) {
     return next();
   });
 });
+router.put('/comments/:comment/remove', function(req, res){
+  Comment.remove({_id : req.comment._id}, function(err, comment){
+    if (err) { return next(err); }  
+	return res.json(comment);
+  });
+});
+
 router.get('/comments/:comment', function(req, res) {
   res.json(req.comment);
 });
@@ -16,8 +25,6 @@ router.get('/comments/:comment', function(req, res) {
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
-var mongoose = require('mongoose');
-var Comment = mongoose.model('Comment');
 
 router.get('/comments', function(req, res, next) {
   Comment.find(function(err, comments){
